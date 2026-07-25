@@ -50,7 +50,7 @@ export default function Analyze() {
 
         {loading && (
           <div className="mt-8 text-center text-gray-500">
-            ⟳ Extracting text from your resume...
+            ⟳ Analyzing your fit — this can take 10–20 seconds...
           </div>
         )}
 
@@ -61,14 +61,63 @@ export default function Analyze() {
         )}
 
         {result && (
-          <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-            <h2 className="font-semibold mb-3">✅ Extracted Resume Text (Debug Preview)</h2>
-            <p className="text-xs text-gray-400 mb-2">
-              File: {result.fileName} — {result.textLength} characters extracted
+          <div className="mt-8 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+                <p className="text-sm text-gray-500 mb-1">Job-Fit Score</p>
+                <p className="text-3xl font-bold text-[var(--color-primary)]">{result.fitScore}%</p>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+                <p className="text-sm text-gray-500 mb-1">ATS Compatibility</p>
+                <p className="text-3xl font-bold text-[var(--color-accent)]">{result.atsScore} / 100</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="font-semibold mb-2">✅ Matching Skills</h2>
+              <p className="text-gray-600 text-sm">
+                {result.matchingSkills.length ? result.matchingSkills.join(" · ") : "None found"}
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="font-semibold mb-2">⚠️ Missing Skills</h2>
+              <p className="text-gray-600 text-sm">
+                {result.missingSkills.length ? result.missingSkills.join(" · ") : "None found"}
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="font-semibold mb-2">💡 Suggestions</h2>
+              <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+                {result.suggestions.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="font-semibold mb-2">🔍 ATS Report</h2>
+              <p className="text-gray-600 text-sm mb-2">
+                Missing Keywords:{" "}
+                {result.atsMissingKeywords.length ? result.atsMissingKeywords.join(", ") : "None"}
+              </p>
+              <p className="text-gray-600 text-sm mb-2">
+                {result.atsSectionChecks.contactInfo ? "✅" : "❌"} Contact Info{"  "}
+                {result.atsSectionChecks.experience ? "✅" : "❌"} Experience{"  "}
+                {result.atsSectionChecks.education ? "✅" : "❌"} Education{"  "}
+                {result.atsSectionChecks.skills ? "✅" : "❌"} Skills
+              </p>
+              {result.atsFormattingFeedback.length > 0 && (
+                <p className="text-gray-600 text-sm">
+                  Formatting: {result.atsFormattingFeedback.join(" ")}
+                </p>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-400 text-center">
+              (This result is not saved yet — the dashboard and history feature is built on Day 6.)
             </p>
-            <pre className="whitespace-pre-wrap text-sm text-gray-600 max-h-96 overflow-y-auto border border-gray-200 rounded p-4">
-              {result.extractedText}
-            </pre>
           </div>
         )}
       </main>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { parseResume } from "@/lib/parseResume";
+import { analyzeResumeVsJob } from "@/lib/aiPrompt";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [".pdf", ".docx"];
@@ -46,11 +47,19 @@ export async function POST(request) {
       return NextResponse.json({ error: parseError.message }, { status: 422 });
     }
 
+    let analysis;
+    try {
+      analysis = await analyzeResumeVsJob(extractedText, jobDescription);
+    } catch (aiError) {
+      return NextResponse.json({ error: aiError.message }, { status: 502 });
+    }
+
     return NextResponse.json({
       fileName: file.name,
-      textLength: extractedText.length,
-      extractedText,
-      jobDescription,
+      jobTitleSnippet: jobDescription.trim().slice(0, 60),
+      jobDescription: jobDescription.trim(),
+      resumeText: extractedText,
+      ...analysis,
     });
   } catch (err) {
     console.error("Analyze route error:", err);
