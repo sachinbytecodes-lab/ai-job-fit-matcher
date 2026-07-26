@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import connectDB from "@/lib/mongodb";
+import Analysis from "@/models/Analysis";
 import { parseResume } from "@/lib/parseResume";
 import { analyzeResumeVsJob } from "@/lib/aiPrompt";
 
@@ -10,7 +12,7 @@ export async function POST(request) {
   try {
     const session = await getServerSession();
 
-    if (!session) {
+    if (!session || !session.user?.email) {
       return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
     }
 
@@ -54,13 +56,26 @@ export async function POST(request) {
       return NextResponse.json({ error: aiError.message }, { status: 502 });
     }
 
-    return NextResponse.json({
-      fileName: file.name,
-      jobTitleSnippet: jobDescription.trim().slice(0, 60),
+    await connectDB();
+
+    const saved = await Analysis.create({
+      userId: session.user.email,
+      userEmail: session.user.email,
+      jobTitleSnippet: analysis.jobTitle,
       jobDescription: jobDescription.trim(),
+      resumeFileName: file.name,
       resumeText: extractedText,
-      ...analysis,
+      fitScore: analysis.fitScore,
+      matchingSkills: analysis.matchingSkills,
+      missingSkills: analysis.missingSkills,
+      suggestions: analysis.suggestions,
+      atsScore: analysis.atsScore,
+      atsMissingKeywords: analysis.atsMissingKeywords,
+      atsSectionChecks: analysis.atsSectionChecks,
+      atsFormattingFeedback: analysis.atsFormattingFeedback,
     });
+
+    return NextResponse.json({ analysisId: saved._id.toString() }, { status: 201 });
   } catch (err) {
     console.error("Analyze route error:", err);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });

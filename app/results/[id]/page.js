@@ -1,50 +1,64 @@
-import Navbar from "@/components/Navbar";
+"use client";
 
-export default function Results() {
+import { useEffect, useState, use } from "react";
+import Navbar from "@/components/Navbar";
+import ResultCard from "@/components/ResultCard";
+
+export default function Results({ params }) {
+  const { id } = use(params);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function fetchAnalysis() {
+      try {
+        const res = await fetch(`/api/analyses/${id}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Could not load this analysis.");
+        }
+
+        setResult(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAnalysis();
+  }, [id]);
+
   return (
     <>
       <Navbar />
-      <main className="max-w-3xl mx-auto px-6 py-10">
-        <h1 className="text-xl font-bold mb-6">Backend Engineer @ Acme Corp — Jul 20, 2026</h1>
+      <main className="max-w-3xl mx-auto px-6 py-10 w-full">
+        {loading && <p className="text-gray-500">Loading analysis...</p>}
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">Job-Fit Score</p>
-            <p className="text-3xl font-bold text-[var(--color-primary)]">78%</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">ATS Compatibility</p>
-            <p className="text-3xl font-bold text-[var(--color-accent)]">65 / 100</p>
-          </div>
-        </div>
+        {error && (
+          <div className="bg-red-50 text-red-600 rounded-lg p-4 text-sm">{error}</div>
+        )}
 
-        <section className="mb-6">
-          <h2 className="font-semibold mb-2">✅ Matching Skills</h2>
-          <p className="text-gray-600">React · Node.js · REST APIs</p>
-        </section>
+        {result && (
+          <>
+            <h1 className="text-xl font-bold mb-6">
+              {result.jobTitleSnippet} —{" "}
+              {new Date(result.createdAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </h1>
 
-        <section className="mb-6">
-          <h2 className="font-semibold mb-2">⚠️ Missing Skills</h2>
-          <p className="text-gray-600">GraphQL · Docker</p>
-        </section>
+            <ResultCard result={result} />
 
-        <section className="mb-6">
-          <h2 className="font-semibold mb-2">💡 Suggestions</h2>
-          <ul className="list-disc list-inside text-gray-600 space-y-1">
-            <li>Add "GraphQL" if you've used it</li>
-            <li>Mention containerization experience</li>
-          </ul>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="font-semibold mb-2">🔍 ATS Report</h2>
-          <p className="text-gray-600 mb-1">Missing Keywords: CI/CD, Agile</p>
-          <p className="text-gray-600">✅ Contact Info ✅ Experience ✅ Education ❌ Skills section</p>
-        </section>
-
-        <a href="/dashboard" className="text-[var(--color-primary)] font-medium">
-          ← Back to Dashboard
-        </a>
+            <a href="/dashboard" className="text-[var(--color-primary)] font-medium mt-8 inline-block">
+              ← Back to Dashboard
+            </a>
+          </>
+        )}
       </main>
     </>
   );

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const AnalysisSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
+  userId: { type: String, required: true, index: true },
   userEmail: { type: String, required: true },
   jobTitleSnippet: { type: String, required: true },
   jobDescription: { type: String, required: true, minlength: 50 },
