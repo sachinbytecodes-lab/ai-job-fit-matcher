@@ -22,6 +22,7 @@ export default function Navbar() {
         </a>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
+          aria-label={session?.user?.name ? `Sign out of ${session.user.name}'s account` : "Sign out"}
           title="Sign out"
           className="w-8 h-8 rounded-full bg-[var(--color-accent)] text-white text-xs"
         >

@@ -7,6 +7,8 @@ import { analyzeResumeVsJob } from "@/lib/aiPrompt";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [".pdf", ".docx"];
+const MAX_JD_LENGTH = 5000;
+const MAX_RESUME_TEXT_LENGTH = 20000;
 
 export async function POST(request) {
   try {
@@ -42,6 +44,13 @@ export async function POST(request) {
       );
     }
 
+    if (jobDescription.trim().length > MAX_JD_LENGTH) {
+      return NextResponse.json(
+        { error: `Job description is too long. Please keep it under ${MAX_JD_LENGTH} characters.` },
+        { status: 400 }
+      );
+    }
+
     let extractedText;
     try {
       extractedText = await parseResume(file);
@@ -49,9 +58,13 @@ export async function POST(request) {
       return NextResponse.json({ error: parseError.message }, { status: 422 });
     }
 
+    if (extractedText.length > MAX_RESUME_TEXT_LENGTH) {
+      extractedText = extractedText.slice(0, MAX_RESUME_TEXT_LENGTH);
+    }
+
     let analysis;
     try {
-      analysis = await analyzeResumeVsJob(extractedText, jobDescription);
+      analysis = await analyzeResumeVsJob(extractedText, jobDescription.trim());
     } catch (aiError) {
       return NextResponse.json({ error: aiError.message }, { status: 502 });
     }

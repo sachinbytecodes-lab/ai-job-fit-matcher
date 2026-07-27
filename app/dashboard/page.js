@@ -11,8 +11,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchAnalyses() {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       try {
-        const res = await fetch("/api/analyses");
+        const res = await fetch("/api/analyses", { signal: controller.signal });
+        clearTimeout(timeoutId);
         const data = await res.json();
 
         if (!res.ok) {
@@ -21,7 +25,11 @@ export default function Dashboard() {
 
         setAnalyses(data.analyses);
       } catch (err) {
-        setError(err.message);
+        if (err.name === "AbortError") {
+          setError("This is taking longer than expected. Please refresh the page.");
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }

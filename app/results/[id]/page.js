@@ -12,8 +12,12 @@ export default function Results({ params }) {
 
   useEffect(() => {
     async function fetchAnalysis() {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       try {
-        const res = await fetch(`/api/analyses/${id}`);
+        const res = await fetch(`/api/analyses/${id}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         const data = await res.json();
 
         if (!res.ok) {
@@ -22,7 +26,11 @@ export default function Results({ params }) {
 
         setResult(data);
       } catch (err) {
-        setError(err.message);
+        if (err.name === "AbortError") {
+          setError("This is taking longer than expected. Please refresh the page.");
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -44,7 +52,7 @@ export default function Results({ params }) {
         {result && (
           <>
             <h1 className="text-xl font-bold mb-6">
-              {result.jobTitleSnippet} —{" "}
+              {result.jobTitleSnippet} -{" "}
               {new Date(result.createdAt).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -55,7 +63,7 @@ export default function Results({ params }) {
             <ResultCard result={result} />
 
             <a href="/dashboard" className="text-[var(--color-primary)] font-medium mt-8 inline-block">
-              ← Back to Dashboard
+              &larr; Back to Dashboard
             </a>
           </>
         )}
