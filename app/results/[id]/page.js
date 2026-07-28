@@ -4,6 +4,21 @@ import { useEffect, useState, use } from "react";
 import Navbar from "@/components/Navbar";
 import ResultCard from "@/components/ResultCard";
 
+function ResultsSkeleton() {
+  return (
+    <div className="space-y-5 animate-pulse">
+      <div className="h-6 bg-gray-200 rounded w-1/2" />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="card h-28" />
+        <div className="card h-28" />
+      </div>
+      <div className="card h-24" />
+      <div className="card h-24" />
+      <div className="card h-32" />
+    </div>
+  );
+}
+
 export default function Results({ params }) {
   const { id } = use(params);
   const [result, setResult] = useState(null);
@@ -16,7 +31,7 @@ export default function Results({ params }) {
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
       try {
-        const res = await fetch(`/api/analyses/${id}`, { signal: controller.signal });
+        const res = await fetch("/api/analyses/" + id, { signal: controller.signal });
         clearTimeout(timeoutId);
         const data = await res.json();
 
@@ -43,27 +58,32 @@ export default function Results({ params }) {
     <>
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-10 w-full">
-        {loading && <p className="text-gray-500">Loading analysis...</p>}
+        {loading && <ResultsSkeleton />}
 
         {error && (
-          <div className="bg-red-50 text-red-600 rounded-lg p-4 text-sm">{error}</div>
+          <div className="bg-red-50 text-red-600 rounded-xl p-4 text-sm border border-red-100">{error}</div>
         )}
 
         {result && (
           <>
-            <h1 className="text-xl font-bold mb-6">
-              {result.jobTitleSnippet} -{" "}
-              {new Date(result.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </h1>
+            <div className="mb-6">
+              <h1 className="text-xl font-bold text-[var(--color-text)]">{result.jobTitleSnippet}</h1>
+              <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                {new Date(result.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </p>
+            </div>
 
             <ResultCard result={result} />
 
-            <a href="/dashboard" className="text-[var(--color-primary)] font-medium mt-8 inline-block">
-              &larr; Back to Dashboard
+            <a
+              href="/dashboard"
+              className="text-[var(--color-primary)] font-medium mt-8 inline-flex items-center gap-1 text-sm"
+            >
+              ← Back to Dashboard
             </a>
           </>
         )}

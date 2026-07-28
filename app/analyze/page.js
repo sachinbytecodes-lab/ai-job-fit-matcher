@@ -41,20 +41,25 @@ export default function Analyze() {
     <>
       <Navbar />
       <main className="max-w-2xl mx-auto px-6 py-10 w-full">
-        <h1 className="text-2xl font-bold text-[var(--color-primary)] mb-6">
+        <h1 className="text-2xl font-bold text-[var(--color-text)] mb-1">
           New Job-Fit Analysis
         </h1>
+        <p className="text-sm text-[var(--color-text-muted)] mb-8">
+          Upload your resume and paste a job description to get started
+        </p>
 
-        <UploadForm onSubmit={handleSubmit} loading={loading} />
+        <div className="card p-6 sm:p-8">
+          <UploadForm onSubmit={handleSubmit} loading={loading} />
+        </div>
 
         {loading && (
-          <div className="mt-8 text-center text-gray-500">
-            Analyzing your fit - this can take 10-20 seconds...
+          <div className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
+            This usually takes 10-20 seconds...
           </div>
         )}
 
         {error && (
-          <div className="mt-8 bg-red-50 text-red-600 rounded-lg p-4 text-sm">
+          <div className="mt-6 bg-red-50 text-red-600 rounded-xl p-4 text-sm border border-red-100" role="alert">
             {error}
           </div>
         )}
