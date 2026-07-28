@@ -1,44 +1,75 @@
-# ai-job-fit-matcher
-AI-powered resume vs job description matcher with ATS compatibility scoring
+# AI Job-Fit Matcher
 
+Know your fit before you apply. Upload your resume, paste a job description, and get an instant AI-powered fit score, skill gap analysis, and ATS compatibility report.
 
+**Live app:** https://ai-job-fit-matcher-bay.vercel.app
 
+Built as part of the AB Talks 60-Day Claude AI Challenge — a 10-day capstone project built end-to-end with Claude.
 
+## Features
 
+- **Google Sign-In** — secure authentication, no passwords stored
+- **Resume Upload** — supports PDF and DOCX
+- **AI Job-Fit Analysis** — fit score, matching skills, missing skills, and actionable suggestions powered by Google Gemini
+- **ATS Compatibility Report** — ATS score, missing keywords, section checks, and formatting feedback
+- **Analysis History** — every analysis is saved and revisitable from a personal dashboard
+- **Fully responsive**, accessible UI
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Tech Stack
 
-## Getting Started
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Styling | Tailwind CSS v4 |
+| Authentication | NextAuth.js (Google OAuth) |
+| Database | MongoDB Atlas |
+| AI | Google Gemini API (free tier) |
+| File Parsing | pdf-parse, mammoth |
+| Hosting | Vercel |
 
-First, run the development server:
+100% built on free-tier services — no paid APIs or subscriptions required to run this project.
+
+## Getting Started Locally
+
+### Prerequisites
+- Node.js v18 or higher
+- A MongoDB Atlas account (free tier)
+- A Google Cloud project with OAuth credentials
+- A Google Gemini API key (free, from Google AI Studio)
+
+### Installation
+
+```bash
+git clone https://github.com/sachinbytecodes-lab/ai-job-fit-matcher.git
+cd ai-job-fit-matcher
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file in the project root:
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+MONGODB_URI=
+GEMINI_API_KEY=
+
+See `docs/ENVIRONMENT.md` for details on obtaining each value.
+
+### Run Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Project Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Full planning, design, and daily build documentation is available in [`/docs`](./docs), including the original PRD, architecture diagrams, database schema, API design, and a day-by-day build log.
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT — see [LICENSE](./LICENSE) for details.
