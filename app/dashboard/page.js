@@ -52,6 +52,10 @@ export default function Dashboard() {
     fetchAnalyses();
   }, []);
 
+  function handleDeleted(deletedId) {
+    setAnalyses((prev) => prev.filter((a) => a._id !== deletedId));
+  }
+
   return (
     <>
       <Navbar />
@@ -63,10 +67,12 @@ export default function Dashboard() {
               {analyses.length > 0 ? analyses.length + " analyses" : "Track your job-fit history"}
             </p>
           </div>
+
             <a
             href="/analyze"
             className="bg-[var(--color-primary)] text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--color-primary-dark)] shadow-sm whitespace-nowrap"
           >
+          
             + New Analysis
           </a>
         </div>
@@ -88,16 +94,20 @@ export default function Dashboard() {
             <div className="text-4xl mb-4">📋</div>
             <p className="text-[var(--color-text)] font-medium mb-1">No analyses yet</p>
             <p className="text-sm text-[var(--color-text-muted)] mb-6">Upload a resume and job description to get started</p>
+
               <a
               href="/analyze"
               className="bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-medium inline-block hover:bg-[var(--color-primary-dark)]"
             >
+      
               + Start Your First Analysis
             </a>
           </div>
         )}
 
-        {!loading && !error && analyses.length > 0 && <DashboardList analyses={analyses} />}
+        {!loading && !error && analyses.length > 0 && (
+          <DashboardList analyses={analyses} onDeleted={handleDeleted} />
+        )}
       </main>
     </>
   );

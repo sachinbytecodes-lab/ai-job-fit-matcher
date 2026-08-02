@@ -50,3 +50,38 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
   }
 }
+
+export async function DELETE(request, { params }) {
+  try {
+    const session = await getServerSession();
+
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid analysis id." }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const analysis = await Analysis.findById(id);
+
+    if (!analysis) {
+      return NextResponse.json({ error: "Analysis not found." }, { status: 404 });
+    }
+
+    if (analysis.userId !== session.user.email) {
+      return NextResponse.json({ error: "You do not have access to this analysis." }, { status: 403 });
+    }
+
+    await Analysis.deleteOne({ _id: id });
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Analysis delete route error:", err);
+    return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
+  }
+}
